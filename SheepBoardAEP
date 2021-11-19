@@ -1,0 +1,676 @@
+//AEP
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <ctype.h>
+#include <conio.c>
+#include <time.h>
+#include <Windows.h>
+#include <unistd.h>
+#define STRTAM 40
+
+
+
+//Variaveis Globais-------------------------------------------------------------
+//Variaveis de Clientes
+
+    char paisCliente[200][15], ufCliente[200][3], cidCliente[200][30], cepCliente[200][10], bairroCliente[200][30], lograCliente[200][50], numCliente[200][10], complemCliente[200][5];     
+    char cpfcnpjCliente[200][15], nomeCompletoCliente[200][50], emailCliente[200][30], telempCliente[200][15], telcomCliente[200][15];
+
+//Variaveis do Financeiro
+    char categoriaGasto[200][15], carneiroGasto[200][30], nomeGasto[200][30], dataGasto[200][15], pesoCarneiroGasto[200][10], valorGasto[200][15], descGasto[200][50];
+    char dataVendaFinanceiro[200][15], carneiroVendaFinanceiro[200][15], clienteVendaFinanceiro[200][30], valortotalVendaFinanceiro[200][15];      
+
+//Variaveis do Carneiro
+    char numeroBrincoCarneiro[200][10], nomeCarneiro[200][30], dataNascCarneiro[200][15], pesoCarneiro[200][10], especieCarneiro[200][15], racaCarneiro[200][15], sexoCarneiro[200][3], cartegoriaCarneiro[200][15];
+
+//Variaveis das Vacinas
+    char nomeLoteVacinas[200][30], sexoLoteVacinas[200][3], categoriaLoteVacinas[200][15], idadeLoteVacinas[200][3];
+    char nomeVacina[200][20],dataVencVacina[200][15],dataaplicacaoVacina[200][15],anotacoesVacina[200][50]; 
+    
+//Variaveis das Pesagens dos Carneiros 
+    char ultimoPesoCarneiro[15], dataUltimaPesagem[15], novaPesagem[15], dataNovaPesagem[15]; 
+           
+//Contadores    
+
+    int contadorclientes, contadorGastos, contadorVendas, contadorVacinas, contadorCarneiros, pfpjCliente[200], numlote, contadortemporarioBrinco, i;
+    
+    
+//Header------------------------------------------------------------------------  
+  
+void apresentacao(){
+     textcolor(LIGHTRED);     
+     printf("-----------------------------------------------------------------\n");
+     printf("|                                                               |\n");
+     printf("|     Esse aplicativo demonstra funcionamento de um sistema     |\n");
+     printf("|     voltado para controle do rebanho, manejo sanitario e      |\n");
+     printf("|     financeiro para com caprinocultura e/ou ovinocultura.     |\n");
+     printf("|                                                               |\n");
+     printf("|                                                               |\n");
+     printf("|    *Solicitar Acesso do Cliente com dados de cadastro.        |\n");
+     printf("|    *Solicitar Cadastro do Cliente, dos Animais, dos Gastos,   |\n");
+     printf("|     de Vendas e de Vacinas por lotes.                         |\n");
+     printf("|    *Alterar, incluir e excluir dados dos animais e            |\n");
+     printf("|     do cliente.                                               |\n");
+     printf("|    *Consulta de Clientes e Animais.                           |\n");
+     printf("|                                                               |\n");
+     printf("|                                                               |\n");
+     printf("-----------------------------------------------------------------\n");
+     system("pause");
+     system("cls");
+     textcolor(LIGHTGRAY);
+}
+//End--------------------------------------------------------------------------
+void final(){
+     textcolor(LIGHTRED);     
+     printf("-----------------------------------------------------------------\n");
+     printf("|                                                               |\n");
+     printf("|                 OBRIGADO POR USAR O SHEEPBOARD                |\n");
+     printf("|                                                               |\n");
+     printf("-----------------------------------------------------------------\n");
+}
+//-------------------------------MENU GERAL----------------------------------
+
+void criarmenulinhasuperior(){
+     int i;
+     fflush(stdin);
+     printf("%c",201);
+     for(i=0;i<STRTAM;i++)
+        printf("%c",205);
+     printf("%c\n",187);
+}
+
+void criarmenulinhainferior(int tamX){
+     int i;
+     fflush(stdin);
+     printf("%c",200);
+     for(i=0;i<STRTAM;i++)
+        printf("%c",205);
+     printf("%c\n",188);
+}
+
+void criarmenulitens(int tamX, char str[]){
+     fflush(stdin);
+     
+     printf("%c",186);
+     textcolor(LIGHTGREEN);
+     printf("%-*s",tamX,str);
+  
+     textcolor(LIGHTGRAY);
+     printf("%c\n",186);
+}
+
+void menuhead(int tamX){
+     int i;
+     printf("%c",204);
+     for(i=0;i<tamX;i++){
+        printf("%c",205);
+     }
+     printf("%c\n",185);
+     
+}
+//-------------------------------LOGIN-----------------------------
+void login(){
+     char login[50],senha[50];
+     fflush(stdin);
+
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"SHEEPBOARD");
+     menuhead(STRTAM);
+     criarmenulitens(STRTAM,"LOGIN");
+     criarmenulinhainferior(STRTAM);
+     gets(login);
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"SENHA");
+     criarmenulinhainferior(STRTAM);
+     gets(senha);   
+     criarmenulinhainferior(STRTAM);
+     system("cls");
+}
+//------------------------------ABA CLIENTES----------------------------------
+void classificaCarneiro(){
+     int i,j;
+     char trocatemporaria[15];
+     
+     for(i=1;i<contadorCarneiros;i++){
+         strcpy(trocatemporaria,numeroBrincoCarneiro[i]);
+         for(j=i;(j>0) && (strcmp(trocatemporaria,numeroBrincoCarneiro[j-1])<0);j--)
+         strcpy(numeroBrincoCarneiro[j],numeroBrincoCarneiro[j-1]);
+         
+         strcpy(numeroBrincoCarneiro[j],trocatemporaria);        
+     }
+}
+
+void classificaCliente(){
+     
+     int i,j;
+     char trocatemporaria[15];
+     
+     for(i=1;i<contadorclientes;i++){
+         strcpy(trocatemporaria,numCliente[i]);
+         for(j=i;(j>0) && (strcmp(trocatemporaria,numCliente[j-1])<0);j--)
+         strcpy(numCliente[j],numCliente[j-1]);
+         
+         strcpy(numCliente[j],trocatemporaria);        
+     }
+}
+
+void enderecoCliente(int n){
+system("cls");    
+
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"ENDERECO");
+     criarmenulinhainferior(STRTAM);
+    printf("Pais: \n");
+    gets(paisCliente[n]);
+    printf("Estado: \n");
+    gets(ufCliente[n]);
+    printf("Cidade: \n");
+    gets(cidCliente[n]);
+    printf("CEP: \n");
+    gets(cepCliente[n]);
+    printf("Bairro: \n");
+    gets(bairroCliente[n]);
+    printf("Logradouro: \n");
+    gets(lograCliente[n]);
+    printf("Numero: \n");
+    gets(numCliente[n]);
+    printf("Complemento: \n");
+    gets(complemCliente[n]);
+}
+
+void cadastraClientes(int count){
+system("cls");
+fflush(stdin);
+
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"CADASTRO DOS CLIENTES");
+     criarmenulinhainferior(STRTAM);     
+     do{
+     printf("Pessoa fisica ou juridica? (1 - Fisica 2 - Juridica)\n");     
+     scanf("%d",&pfpjCliente[count]);     
+     }while(pfpjCliente[count]!=1 && pfpjCliente[count]!=2);
+     fflush(stdin);
+     printf("Digite seu CPF/CNPJ:\n");     
+     gets(cpfcnpjCliente[count]);
+     printf("Nome Completo:\n");     
+     gets(nomeCompletoCliente[count]);
+     printf("Email:\n");     
+     gets(emailCliente[count]);
+     printf("Telefone Empresarial:\n");     
+     gets(telempCliente[count]);
+     printf("Telefone Comercial:\n");     
+     gets(telcomCliente[count]);
+     enderecoCliente(count);
+     contadorclientes++;
+     system("cls");
+}
+
+
+void fichaClientes(){
+     int codCliente;
+     system("cls");
+     classificaCliente();
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"DADOS DOS CLIENTES");
+     criarmenulinhainferior(STRTAM);
+     printf("\nNumero  CPF/CNPJ  NOME    EMAIL   TELEFONE\n");
+     printf("001     CPF/CNPJ  NOME    EMAIL   TELEFONE\n");
+     printf("002     CPF/CNPJ  NOME    EMAIL   TELEFONE\n");
+     printf("003     CPF/CNPJ  NOME    EMAIL   TELEFONE\n");
+     printf("004     CPF/CNPJ  NOME    EMAIL   TELEFONE\n");
+     printf("005     CPF/CNPJ  NOME    EMAIL   TELEFONE\n\n");
+     printf("Escolha o numero que representa o cliente para ver o Endereco ou digite 0 para voltar: ");
+     scanf("%d",&codCliente);
+     system("cls");     
+     
+}
+void menuClientes(){
+     system("cls");
+     int escolhamenuclientes;
+          
+         
+         
+         do{
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CLIENTES");
+         menuhead(STRTAM);
+         criarmenulitens(STRTAM,"1 - Cadastro dos Clientes");
+         criarmenulitens(STRTAM,"2 - Consulta dos Clientes");
+         criarmenulitens(STRTAM,"0 - Voltar");
+         criarmenulinhainferior(STRTAM);    
+         scanf("%d",&escolhamenuclientes);
+             switch (escolhamenuclientes){
+                 case 1:             
+                        cadastraClientes(contadorclientes);
+                 break;
+                 case 2:
+                      fichaClientes();                        
+                 break;
+                 case 0:
+                      system("cls");
+                 break;
+                 default:
+                         printf("\n*** Digite opcao valida! ***\n\n");
+                 }
+         }while(escolhamenuclientes!=0);
+}
+
+//ABA FINANCEIRO---------------------------------------------------------------
+//CADASTRO DE GASTOS
+void FichaGastos(){
+     system("cls");
+     classificaCliente();
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"Ficha de Gastos");
+     criarmenulinhainferior(STRTAM);
+     printf("\nCategoria  Nome do gasto    Data   Valor\n");
+     printf("001        Nome do gasto    Data   Valor\n");
+     printf("002        Nome do gasto    Data   Valor\n");
+     printf("003        Nome do gasto    Data   Valor\n");
+     printf("004        Nome do gasto    Data   Valor\n");
+     printf("005        Nome do gasto    Data   Valor\n\n");
+system("pause");
+system("cls");
+}
+
+void FichaVendas(){
+     system("cls");
+     classificaCliente();
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"Ficha de Vendas");
+     criarmenulinhainferior(STRTAM);
+     printf("\nNumero  Data da venda  Carneiro    Cliente   Valor\n");
+     printf("001     Data da venda  Carneiro    Cliente   Valor\n");
+     printf("002     Data da venda  Carneiro    Cliente   Valor\n");
+     printf("003     Data da venda  Carneiro    Cliente   Valor\n");
+     printf("004     Data da venda  Carneiro    Cliente   Valor\n");
+     printf("005     Data da venda  Carneiro    Cliente   Valor\n\n");
+system("pause");
+system("cls");     
+}
+void cadastroGastos(int n){
+fflush(stdin);
+system("cls");
+
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CADASTRO DE GASTOS");
+         criarmenulinhainferior(STRTAM);
+    printf("Categoria do gasto: \n");
+    gets(categoriaGasto[n]);
+    printf("Carneiro: \n");
+    gets(carneiroGasto[n]);
+    printf("Nome do gasto: \n");
+    gets(nomeGasto[n]);
+    printf("Data do gasto: \n");
+    gets(dataGasto[n]);
+    printf("Peso: \n");
+    gets(pesoCarneiroGasto[n]);
+    printf("Valor do gasto: \n");
+    gets(valorGasto[n]);
+    printf("Descricao do gasto: \n");
+    gets(descGasto[n]);
+    contadorGastos++;
+system("cls");
+}
+
+void cadastroVendas(int n){
+fflush(stdin);
+system("cls");
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CADASTRO DE VENDAS");
+         criarmenulinhainferior(STRTAM);      
+    printf("Data da venda: \n");
+    gets(dataVendaFinanceiro[n]);
+    printf("Carneiro: \n");
+    gets(carneiroVendaFinanceiro[n]);
+    printf("Cliente: \n");
+    gets(clienteVendaFinanceiro[n]);
+    printf("Valor total: \n");
+    gets(valortotalVendaFinanceiro[n]);
+    contadorVendas++;
+system("cls");
+}
+
+//MENU FINANCEIRO--------------------------------------------------------------
+void menuFinanceiro(){
+system("cls");
+        
+         int escolhamenufinanceiro;
+              
+         do{
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"FINANCEIRO");
+         menuhead(STRTAM);
+         criarmenulitens(STRTAM,"1 - Cadastro de Gastos");
+         criarmenulitens(STRTAM,"2 - Cadastro de Vendas"); 
+         criarmenulitens(STRTAM,"0 - Voltar");
+         criarmenulinhainferior(STRTAM);    
+         scanf("%d",&escolhamenufinanceiro);
+             switch (escolhamenufinanceiro){
+                 case 1:
+                       cadastroGastos(contadorGastos);
+                 break;
+                 case 2:
+                       cadastroVendas(contadorVendas);
+                 break;
+                 case 0:
+                      system("cls");
+                 break;
+                 default:
+                         printf("\n*** Digite opcao valida! ***\n\n");
+                 }
+         }while(escolhamenufinanceiro!=0);         
+     
+}
+
+//ABA CARNEIROS---------------------------------------------------------------
+void fichaCarneiro(){
+     fflush(stdin);
+     system("cls");
+     classificaCarneiro();
+
+     criarmenulinhasuperior();
+     criarmenulitens(STRTAM,"FICHA DE CARNEIROS");
+     criarmenulinhainferior(STRTAM);
+     printf("\nNumeroCarneiro  Nome  Data    Peso   TELEFONE\n");
+     printf("001             Nome  Data    Peso   TELEFONE\n");
+     printf("002             Nome  Data    Peso   TELEFONE\n");
+     printf("003             Nome  Data    Peso   TELEFONE\n");
+     printf("004             Nome  Data    Peso   TELEFONE\n");
+     printf("005             Nome  Data    Peso   TELEFONE\n\n");
+system("pause");
+system("cls");
+}
+
+void trocaPeso(){
+fflush(stdin);
+system("cls");
+
+        criarmenulinhasuperior();
+        criarmenulitens(STRTAM,"ATUALIZAR PESO");
+        criarmenulinhainferior(STRTAM);
+                
+    printf("Digite o ultimo peso do Carneiro: \n");
+    gets(ultimoPesoCarneiro);
+    printf("Em que data foi feito a pesagem: \n");
+    gets(dataUltimaPesagem);
+    printf("Novo peso: \n");
+    gets(novaPesagem);
+    printf("Data da nova pesagem: \n");
+    gets(dataNovaPesagem);
+    
+    strcpy(pesoCarneiro[contadortemporarioBrinco],novaPesagem);
+    printf("Peso atualizado com Sucesso!\n");
+    system("pause");
+    
+system("cls");
+}
+
+void adicionaLote(int n){
+fflush(stdin);    
+ 
+        criarmenulinhasuperior();
+        criarmenulitens(STRTAM,"INFORMACOES DO LOTE");
+        criarmenulinhainferior(STRTAM);
+    printf("Nome do lote: \n");
+    gets(nomeLoteVacinas[n]);
+    printf("Sexo: \n");
+    gets(sexoLoteVacinas[n]);
+    printf("Categoria: \n");
+    gets(categoriaLoteVacinas[n]);
+    printf("Idade: \n");
+    gets(idadeLoteVacinas[n]);
+    numlote++;
+system("cls");        
+}
+
+void iniciaNovaVacina(int n){
+fflush(stdin);    
+system("cls");
+
+        criarmenulinhasuperior();
+        criarmenulitens(STRTAM,"INICIAR NOVA VACINACAO");
+        criarmenulinhainferior(STRTAM);
+        
+      adicionaLote(numlote);
+      
+        criarmenulinhasuperior();
+        criarmenulitens(STRTAM,"INFORMACOES DA VACINA");
+        criarmenulinhainferior(STRTAM); 
+        
+    printf("Nome da Vacina: \n");
+    gets(nomeVacina[n]);
+    printf("Data de Vencimento: \n");
+    gets(dataVencVacina[n]);
+    printf("Data Inicio da Aplicacao: \n");
+    gets(dataaplicacaoVacina[n]);
+    printf("Anotacoes: \n");
+    gets(anotacoesVacina[n]);  
+    
+}
+
+void cadastroCarneiros(int n){
+fflush(stdin);    
+system("cls");
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CADASTRO DE CARNEIROS");
+         criarmenulinhainferior(STRTAM);     
+    printf("Numero do brinco: \n"); 
+    gets(numeroBrincoCarneiro[n]);
+    printf("Nome do animal: \n");
+    gets(nomeCarneiro[n]);
+    printf("Data de nascimento: \n");
+    gets(dataNascCarneiro[n]);
+    printf("Peso: \n");
+    gets(pesoCarneiro[n]);
+    printf("Especie: \n");
+    gets(especieCarneiro[n]);
+    printf("Raca: \n");
+    gets(racaCarneiro[n]);
+    printf("Sexo (M/F): \n");
+    gets(sexoCarneiro[n]);
+    printf("Categoria: \n");
+    gets(cartegoriaCarneiro[n]);
+    contadorCarneiros++;
+system("cls");
+}
+
+void cadastroVacinas(int n){
+fflush(stdin); 
+system("cls");
+
+   int novavacinacao;
+
+   
+   criarmenulinhasuperior();
+   criarmenulitens(STRTAM,"VACINAS");
+   criarmenulinhainferior(STRTAM);
+   
+    printf("Febre Aftosa\n");
+    printf("[------------------ 76 ----------        ]\n");
+    printf("Clostridiose\n");
+    printf("[------------------ 95 ----------------- ]\n");
+    printf("Raiva\n");
+    printf("[------             10                   ]\n\n");
+    printf("Deseja realizar nova vacinacao? 1 - Sim 0 - Voltar\n");
+    do{
+    scanf("%d",&novavacinacao);
+       switch(novavacinacao){
+          case 1:
+               iniciaNovaVacina(contadorVacinas);
+               break;
+          case 0:
+               system("cls");
+               break;
+          default:
+                  printf("Digite um valor valido!\n");
+       }           
+    }while(novavacinacao!=1 && novavacinacao!=0);
+    contadorVacinas++; 
+system("cls");     
+}
+void atualizarPeso(){
+fflush(stdin);  
+system("cls");
+
+   bool existeBrinco;
+   char validaBrincoCarneiro[15],i[15]="0";
+   
+   
+   
+    do{
+        contadortemporarioBrinco=0;
+        existeBrinco=false;
+        printf("Digite o numero do brinco do animal(0 - Voltar): ");
+        gets(validaBrincoCarneiro);
+        do{
+           if(strcmp(validaBrincoCarneiro,numeroBrincoCarneiro[contadortemporarioBrinco])==0){
+              existeBrinco=true;
+              trocaPeso();
+              }
+              contadortemporarioBrinco++;
+              
+           }while(existeBrinco==false && contadortemporarioBrinco<contadorCarneiros);       
+       }while(existeBrinco==true);
+       if(existeBrinco==false)
+       printf("Numero invalido!\n");
+       system("pause");
+       
+       
+system("cls");     
+}
+//Menu Carneiros-------------------------------------------------------
+void menuCarneiros(){
+system("cls");
+
+         int escolhamenucarneiros;
+              
+         do{
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CARNEIROS");
+         menuhead(STRTAM);
+         criarmenulitens(STRTAM,"1 - Cadastro de Carneiros");
+         criarmenulitens(STRTAM,"2 - Cadastro de Vacinas");
+         criarmenulitens(STRTAM,"3 - Atualizar Peso");
+         criarmenulitens(STRTAM,"0 - Voltar");
+         criarmenulinhainferior(STRTAM);    
+         scanf("%d",&escolhamenucarneiros);
+             switch (escolhamenucarneiros){
+                 case 1:
+                        cadastroCarneiros(contadorCarneiros);
+                 break;
+                 case 2:
+                        cadastroVacinas(contadorVacinas);
+                 break;
+                 case 3:
+                        atualizarPeso();
+                 break;
+                 case 0:
+                      system("cls");
+                 break;
+                 default:
+                         printf("\n*** Digite opcao valida! ***\n\n");
+                 }
+         }while(escolhamenucarneiros!=0);
+
+system("cls");
+}
+//Dashboard--------------------------------------------------------------------
+
+
+void Dashborad(){
+system("cls");
+fflush(stdin);
+int escolhadashboard;
+
+   do{
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"CLIENTES");
+         menuhead(STRTAM);
+         criarmenulitens(STRTAM,"1 - Ficha dos Carneiros");
+         criarmenulitens(STRTAM,"2 - Ficha dos Clientes");
+         criarmenulitens(STRTAM,"3 - Ficha das Financas");
+         criarmenulitens(STRTAM,"0 - Voltar");
+         criarmenulinhainferior(STRTAM);
+         scanf("%d",&escolhadashboard);
+         switch(escolhadashboard){
+         case 1:
+              fichaCarneiro();
+              break;
+         case 2:
+              fichaClientes();
+              break;
+         case 0:
+              break;
+         case 3:
+              FichaGastos();
+              FichaVendas();
+              break;
+         default:
+                 printf("\n*** Digite opcao valida! ***\n\n");
+         }
+   }while(escolhadashboard!=0);
+
+system("cls");     
+}
+//-----------------------------MENU PRINCIPAL---------------------------------
+void menu(){
+     fflush(stdin);
+     int escolhamenu;
+     system("cls");
+     do{
+         criarmenulinhasuperior();
+         criarmenulitens(STRTAM,"SHEEPBOARD");
+         menuhead(STRTAM);
+         criarmenulitens(STRTAM,"1 - Dashboards");
+         criarmenulitens(STRTAM,"2 - Carneiros"); 
+         criarmenulitens(STRTAM,"3 - Financeiro");  
+         criarmenulitens(STRTAM,"4 - Clientes");
+         criarmenulitens(STRTAM,"0 - Sair");
+         criarmenulinhainferior(STRTAM);
+         scanf("%d",&escolhamenu);
+         switch (escolhamenu){
+             case 1:
+                  Dashborad();
+             break;
+             case 2:
+                  menuCarneiros();
+             break;
+             case 3:
+                  menuFinanceiro();
+             break;
+             case 4:
+                  menuClientes();
+             break;
+             case 0:
+             break;
+             default:
+             printf("\n*** Digite opcao valida! ***\n\n");
+         }
+     }while(escolhamenu!=0); 
+system("cls");
+}
+
+
+
+
+//---------------------------PROGRAMA PRINCIPAL--------------------------------
+int main(){
+    fflush(stdin);
+    
+    contadorclientes=0;
+    contadorVendas=0;
+    contadorGastos=0;
+    numlote=0;
+    i=0;
+       
+    apresentacao();
+    login();
+    menu();
+    final();
+    
+
+    system("pause");
+    return (0);
+}
